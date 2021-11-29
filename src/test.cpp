@@ -10,6 +10,7 @@ int main(int argc, char** argv)
 {
   if (argc < 2)
   {
+    std::cout << "Usage: test_planner [NAV_GRAPH]" << std::endl;
     return 0;
   }
 
@@ -29,7 +30,7 @@ int main(int argc, char** argv)
   const std::string& path = argv[1];
   std::cout << "parsing graph" << path << std::endl;
   const auto& graph = parse_graph(path, traits);
-
+  std::cout << "Done parsing graph" << std::endl;
   const auto now = std::chrono::steady_clock::now();
   rmf_traffic::agv::Planner planner{
     rmf_traffic::agv::Planner::Configuration{
@@ -42,25 +43,11 @@ int main(int argc, char** argv)
   const auto& goal = rmf_traffic::agv::Planner::Goal{3000};
 
   auto start_time = std::chrono::steady_clock::now();
-  auto result = planner.translation_plan(
+  auto result = planner.plan(
     start, goal);
   auto finish_time = std::chrono::steady_clock::now();
-  std::cout << "Time taken by translation only planner: "
+  std::cout << "Time taken by planner: "
             << (finish_time - start_time).count() / 1e9
             << std::endl;
 
-  planner = rmf_traffic::agv::Planner{
-    rmf_traffic::agv::Planner::Configuration{
-      graph, traits
-    },
-    rmf_traffic::agv::Planner::Options(nullptr)
-  };
-
-  start_time = std::chrono::steady_clock::now();
-  result = planner.plan(
-    start, goal);
-  finish_time = std::chrono::steady_clock::now();
-  std::cout << "Time taken by default planner:: "
-            << (finish_time - start_time).count() / 1e9
-            << std::endl;
 }
